@@ -12,7 +12,8 @@
     "dev": "nodemon --ext ts,prisma --exec \"npx prisma generate && tsx src/index.ts\""
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "tsoa": "^7.0.0-alpha.0"
   },
   "devDependencies": {
     "@prisma/client": "^6.19.3",
