@@ -18,6 +18,7 @@ import { Request as ExpressRequest } from "express";
 import { StatusCodes } from "http-status-codes";
 import { listUserReviewsService } from "../services/user.service";
 import { ApiResponse } from "../../../common/response/response";
+import { success} from "../../../common/response/response";
 
 
 @Route("users") //라우트경로
@@ -67,30 +68,18 @@ export class UserController extends Controller{
         req.res!.clearCookie("username");
         return '로그아웃 완료 (쿠키 삭제). <a href="/api/v1/users/guest">메인으로</a>';
     }
-}
+    @Get("{userId}/reviews")
+    public async handleListUserReviews(
+        @Path() userId: number,    // 알아서 req.params.userId를 숫자로 빼옵니다!
+        @Query() cursor?: number   // 알아서 req.query.cursor를 숫자로 빼옵니다!
+    ): Promise<any> {
+        console.log("===사용자의 리뷰 조회 요청===");
+        console.log("요청 유저 번호:", userId);
 
+        // 서비스 로직 호출 (이미 숫자로 바뀌어서 Number() 쓸 필요 없음!)
+        const reviews = await listUserReviewsService(userId, cursor);
 
-
-
-
-export const handleListUserReviews = async(req:Request, res:Response) => {
-  try{
-    const {userId} = req.params;
-    console.log("===사용자의 리뷰 조회 요청===");
-    console.log("요청 유저 번호:",userId);
-
-    const cursor = typeof req.query.cursor === "string" ? Number(req.query.cursor) : undefined;
-    const reviews = await listUserReviewsService(Number(userId), cursor);
-    res.status(StatusCodes.OK).json({
-      isSuccess: true,
-      message: "리뷰 목록 조회 성공",
-      data: reviews
-    });
-  } catch(error: any){
-    console.error("리뷰 목록 조회 중 에러:",error);
-    res.status(400).json({
-      isSuccess:false,
-      message:error.message||"리뷰 목록 조회 실패"
-    });
-  }
+        // 성공 규격으로 감싸서 리턴! (과제 필수 사항)
+        return success(reviews);
+    }
 }
