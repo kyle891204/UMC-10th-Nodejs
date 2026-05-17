@@ -3,6 +3,7 @@ import { addReviewRepository } from "../repositories/store.repository";
 import { getStoreById } from "../repositories/store.repository";
 import { getAllStoreReviews } from "../repositories/store.repository";
 import { ReviewListResponse, responseFromReviews, ReviewItem} from '../dtos/store.dto';
+import { AppError} from "../../../common/errors/app.error";
 
 export const addStoreService = async (regionId: number, data: any) => {
     const insertId = await addStoreRepository(regionId, data);
@@ -13,7 +14,11 @@ export const addStoreService = async (regionId: number, data: any) => {
 export const addReviewService = async(storeId: number, data: any) => {
     const store = await getStoreById(storeId);
     if (!store) {
-        throw new Error("존재하지 않는 가게");
+        throw new AppError({
+            statusCode: 404,
+            errorCode: "STORE_NOT_FOUND",
+            message: "존재하지 않는 가게입니다."
+        });
     }
     const insertId = await addReviewRepository(storeId, data);
     return insertId;
